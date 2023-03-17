@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/main.dir/main.cpp.o -o main  -Wl,-rpath,/home/ducphong/anaconda3/lib /usr/lib/x86_64-linux-gnu/libopenblas.so -lm -ldl /home/ducphong/anaconda3/lib/libpython3.8.so 

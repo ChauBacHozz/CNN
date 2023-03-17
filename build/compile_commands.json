@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/ducphong/CNN/build",
+  "command": "/usr/bin/g++ -DHAVE_CBLAS=1 -DXTENSOR_ENABLE_XSIMD -DXTENSOR_USE_XSIMD -isystem /home/ducphong/anaconda3/include -isystem /home/ducphong/anaconda3/include/python3.8 -g   -lcblas -march=native -o CMakeFiles/main.dir/main.cpp.o -c /home/ducphong/CNN/main.cpp",
+  "file": "/home/ducphong/CNN/main.cpp"
+},
+{
+  "directory": "/home/ducphong/CNN/build",
+  "command": "/usr/bin/g++ -DCppModule_EXPORTS -DHAVE_CBLAS=1 -DXTENSOR_ENABLE_XSIMD -isystem /home/ducphong/anaconda3/include -isystem /home/ducphong/anaconda3/include/python3.8 -g -fPIC -fvisibility=hidden   -lcblas -o CMakeFiles/CppModule.dir/main.cpp.o -c /home/ducphong/CNN/main.cpp",
+  "file": "/home/ducphong/CNN/main.cpp"
+}
+]
