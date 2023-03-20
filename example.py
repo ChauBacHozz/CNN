@@ -1,10 +1,6 @@
 from build import CppModule as md
 import numpy as np
 
-np.random.seed(1)
-dZ = np.ones((10,5, 28,28))
-K = np.ones((5,3,3,3))
-print(md.dX_convolution(K, dZ))
 # # print("Spawn zeros: ")
 # # print(md.getArray())
 
@@ -34,6 +30,17 @@ print(md.dX_convolution(K, dZ))
 
 # print(md.convolution(X, K, 1))
 # print(convolution(X, K, 1))
+def max_pooling(input, pool_size = 2):
+    pool_stride = pool_size
+    conv2 = np.zeros((1, (input.shape[1] - pool_size)//pool_stride + 1))
+    for i in range(0,input.shape[0] - pool_size + 1, pool_stride):
+        row = np.array([])
+        for k in range(0,input.shape[1] - pool_size + 1, pool_stride):
+            res = np.max(input[i : i + pool_size,k : k + pool_size])
+            row = np.append(row, res).reshape(1, -1)
+        conv2 = np.vstack((conv2, row))
+    conv2 = conv2[1:,:]
+    return conv2
 def convolution(img_matrix, filter, conv_stride = 1):
     conv = np.zeros((1, (img_matrix.shape[1] - filter.shape[1])//conv_stride + 1))
     for i in range(0,img_matrix.shape[0] - filter.shape[0] + 1, conv_stride):
@@ -56,5 +63,7 @@ def dX_convolution(dZ, K):
             for k in range (K.shape[1]):
                 dX[i][k] = convolution(padded(dZ[i][j], n_pads=kernel_size - 1),np.rot90(K[j][k], 2))
     return dX
-print("-" * 10)
-print(dX_convolution(dZ, K))
+input = np.arange(16).reshape(4,4)
+
+print(max_pooling(input, 2))
+print(md.max_pooling(input, 2))

@@ -317,6 +317,9 @@ CTEST_SUBMIT_RETRY_DELAY:STRING=5
 //Maximum time allowed before CTest will kill the test.
 DART_TESTING_TIMEOUT:STRING=1500
 
+//Path to a program.
+GITCOMMAND:FILEPATH=/usr/bin/git
+
 //Command to build the project
 MAKECOMMAND:STRING=/usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
 
@@ -598,6 +601,8 @@ FIND_PACKAGE_MESSAGE_DETAILS_PYTHON:INTERNAL=/home/ducphong/anaconda3/bin/python
 FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/home/ducphong/anaconda3/bin/python][v3.8.8(3.6)]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
+//ADVANCED property for variable: GITCOMMAND
+GITCOMMAND-ADVANCED:INTERNAL=1
 //Test HAS_FLTO
 HAS_FLTO:INTERNAL=1
 //Have function cheev_

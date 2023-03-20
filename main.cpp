@@ -4,6 +4,7 @@
 #include <xtensor/xpad.hpp>              // xtensor import for the C++ universal functions
 #define FORCE_IMPORT_ARRAY
 #include <xtensor/xtensor.hpp>
+#include <xtensor/xsort.hpp>
 #include <Eigen/Dense>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xview.hpp>
@@ -24,7 +25,12 @@ std::vector<double> convolution(xt::xarray<double>, xt::xarray<double>, int);
 xt::xarray<double> Z_convolution(xt::pyarray<double>, xt::pyarray <double>);
 xt::xarray<double> dK_convolution(xt::pyarray<double>, xt::pyarray <double>);
 xt::xarray<double> dX_convolution(xt::pyarray<double>, xt::pyarray <double>);
-// xt::xarray<double> max_pooling()
+xt::xarray<double> max_pooling(xt::pyarray<double>, int);
+xt::xarray<double> maxpool_de(xt::xarray<double>, xt::xarray<double>, xt::xarray<double>, int);
+xt::xarray<double> avg_pooling(xt::pyarray<double>, int);
+xt::xarray<double> avgpool_de(xt::xarray<double>, xt::xarray<double>, int);
+xt::xarray<double> pool_3d(xt::pyarray<double>, int, string);
+xt::xarray<double> max_pool_de_3d(xt::pyarray<double>,xt::pyarray<double>,xt::pyarray<double>, int, string);
 xt::xarray<double> paddedM(xt::pyarray<double>, int);
 PYBIND11_MODULE(CppModule, m)
 {
@@ -33,13 +39,18 @@ PYBIND11_MODULE(CppModule, m)
     m.def("convolution", &convolution);
     m.def("Z_convolution", &Z_convolution);
     m.def("dX_convolution", &dX_convolution);
-    // m.def("rotM", &rotM);
+    m.def("max_pooling", &max_pooling);
+    m.def("avg_pooling", &avg_pooling);
+    m.def("maxpool_de", &maxpool_de);
+    m.def("avgpool_de", &avgpool_de);
     m.def("conv_3d", &conv_3d);
 }
 
 int main(int argc, char const *argv[])
 {
-
+    xt::xarray<double> a1({3,3}, 2.5);
+    a1.fill(5);
+    cout << a1 << endl;
     return 0;
 }
 
@@ -140,3 +151,90 @@ xt::xarray<double> dX_convolution(xt::pyarray<double> K, xt::pyarray <double> dZ
     }
     return dX;
 }
+xt::xarray<double> max_pooling(xt::pyarray<double> input, int pool_size = 2) {
+    int pool_stride = pool_size;
+    xt::xarray<int> input_shape = xt::adapt(input.shape());
+    xt::xarray<double> res = xt::zeros<double> ({2 , input_shape[0] / pool_size, input_shape[1] / pool_size});
+    for (int i = 0; i < input.shape()[0] - pool_size + 1; i+= pool_size)
+    {
+        for (int k = 0; k < input.shape()[1] - pool_size + 1; k+= pool_size)
+        {
+            res(0, i / pool_size, k / pool_size) = xt::argmax(xt::view(input, xt::range(i, i + pool_size), xt::range(k, k + pool_size)))();
+            res(1, i / pool_size, k / pool_size) = xt::amax(xt::view(input, xt::range(i, i + pool_size), xt::range(k, k + pool_size)))();
+        }
+        
+    }
+    return res;
+}
+xt::xarray<double> avg_pooling(xt::pyarray<double> input, int pool_size = 2) {
+    int pool_stride = pool_size;
+    xt::xarray<double> res = xt::zeros<double> ({input.shape()[0] / pool_size, input.shape()[1] / pool_size});
+    for (int i = 0; i < input.shape()[0] - pool_size + 1; i+= pool_size)
+    {
+        for (int k = 0; k < input.shape()[1] - pool_size + 1; k+= pool_size)
+        {
+            res(i / pool_size, k / pool_size) = xt::mean(xt::view(input, xt::range(i, i + pool_size), xt::range(k, k + pool_size)))();
+        }
+        
+    }
+    return res;
+}
+
+xt::xarray<double> pool_3d(xt::pyarray<double> input, int pool_size = 2, string pool_type = "max") {
+    xt::xarray<double> res = xt::zeros<double> ({input.shape()[0], (input.shape()[1] - pool_size) / pool_size + 1, (input.shape()[2] - pool_size) / pool_size + 1});
+    if (pool_type == "avg") {
+        for (int i = 0; i < input.shape()[0]; i++)
+        {
+            xt::view(res, i, xt::all(), xt::all()) = avg_pooling(xt::view(input, i, xt::all(), xt::all()), pool_size);
+        }
+    } else {
+        for (int i = 0; i < input.shape()[0]; i++)
+        {
+            xt::view(res, i, xt::all(), xt::all()) = xt::view(max_pooling(xt::view(input, i, xt::all(), xt::all()), pool_size), 1, xt::all(), xt::all());
+        }
+    }
+    return res;
+}
+xt::xarray<double> maxpool_de(xt::xarray<double> Z, xt::xarray<double> dP, xt::xarray<double> pos,int pool_size = 2) {
+    int n_cols = Z.shape()[1];  
+    xt::xarray<double> dZ = xt::zeros_like(Z);
+    for (int i = 0; i < dP.shape()[0]; i++) {
+        for (int k = 0; k < dP.shape()[1]; k++) {
+            // cout << (i * pool_size + int(pos(i, k) / 2)) * n_cols + k * 2 + int(pos(i, k) / 2) << endl;
+            dZ((i * pool_size + int(pos(i, k)) / 2) * n_cols + k * 2 + int(pos(i, k)) % 2) = dP(i, k);
+        }
+    }
+    return dZ;
+}
+
+xt::xarray<double> avgpool_de(xt::xarray<double> Z, xt::xarray<double> dP, int pool_size = 2) {
+    xt::xarray<double> dZ = xt::zeros_like(Z);
+    for (int i = 0; i < Z.shape()[0] - pool_size + 1; i+=pool_size)
+    {
+        for (int k = 0; k < Z.shape()[1] - pool_size + 1; k++)
+        {
+            xt::view(dZ, xt::range(i, i + pool_size), xt::range(k, k + pool_size))  = dP(i / pool_size, k / pool_size) / (pool_size * pool_size);
+        }
+        
+    }
+    return dZ;
+}
+
+xt::xarray<double> max_pool_de_3d(xt::pyarray<double> Z,xt::pyarray<double> dP, xt::pyarray<double> pos,int pool_size, string pool_type = "max") {
+    // Z AND dP IS 3D ARRAY
+    xt::xarray<double> dZ = xt::zeros_like(Z);
+    for (int i = 0; i < Z.shape()[0]; i++)
+    {
+        xt::view(dZ, i, xt::all(), xt::all()) = maxpool_de(
+            xt::view(Z, i, xt::all(), xt::all()),
+            xt::view(dP, i, xt::all(), xt::all()),
+            xt::view(pos, i, xt::all(), xt::all()),
+            pool_size
+        );
+    }
+    return dZ;
+}
+
+
+
+

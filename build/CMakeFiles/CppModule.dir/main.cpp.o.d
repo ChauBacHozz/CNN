@@ -427,6 +427,10 @@ CMakeFiles/CppModule.dir/main.cpp.o: /home/ducphong/CNN/main.cpp \
  /home/ducphong/anaconda3/include/xtensor/xview.hpp \
  /home/ducphong/anaconda3/include/xtensor/xview_utils.hpp \
  /home/ducphong/anaconda3/include/xtensor/xtensor.hpp \
+ /home/ducphong/anaconda3/include/xtensor/xsort.hpp \
+ /home/ducphong/anaconda3/include/xtensor/xadapt.hpp \
+ /home/ducphong/anaconda3/include/xtensor/xfixed.hpp \
+ /home/ducphong/anaconda3/include/xtensor/xindex_view.hpp \
  /usr/local/include/Eigen/Dense /usr/local/include/Eigen/Core \
  /usr/local/include/Eigen/src/Core/util/DisableStupidWarnings.h \
  /usr/local/include/Eigen/src/Core/util/Macros.h \
@@ -665,7 +669,6 @@ CMakeFiles/CppModule.dir/main.cpp.o: /home/ducphong/CNN/main.cpp \
  /home/ducphong/anaconda3/include/xtensor-python/pytensor.hpp \
  /home/ducphong/anaconda3/include/xtensor/xutils.hpp \
  /home/ducphong/anaconda3/include/xtensor/xadapt.hpp \
- /home/ducphong/anaconda3/include/xtensor/xfixed.hpp \
  /home/ducphong/anaconda3/include/xtensor/xreducer.hpp \
  /home/ducphong/anaconda3/include/xtensor-blas/xlinalg.hpp \
  /home/ducphong/anaconda3/include/xtensor/xcomplex.hpp \
